@@ -12,13 +12,13 @@ function App() {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<AddressFeatureCollection>();
     const [loading, setLoading] = useState(false);
-    const [startingAddress, setStartingAddress] = useState<AddressFeature | null>(null);
-    const [destinationAddress, setDestinationAddress] = useState<AddressFeature | null>(null);
+    const [origin, setOrigin] = useState<AddressFeature | null>(null);
+    const [destination, setDestination] = useState<AddressFeature | null>(null);
 
     useEffect(() => {
         setSearchTerm('');
         setSearchResults(undefined);
-    }, [startingAddress, destinationAddress]);
+    }, [origin, destination]);
 
     useEffect(() => {
         (async () => {
@@ -45,24 +45,20 @@ function App() {
                     <SearchField
                         label={'Origin'}
                         loading={loading}
-                        value={startingAddress}
+                        value={origin}
                         options={searchResults?.features}
                         onInput={setSearchTerm}
-                        onChange={setStartingAddress}
+                        onChange={setOrigin}
                     />
                     <SearchField
                         label={'Destination'}
                         loading={loading}
-                        value={destinationAddress}
+                        value={destination}
                         options={searchResults?.features}
                         onInput={setSearchTerm}
-                        onChange={setDestinationAddress}
+                        onChange={setDestination}
                     />
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        disabled={!startingAddress || !destinationAddress}
-                    >
+                    <Button variant="contained" color="primary" disabled={!origin || !destination}>
                         Submit
                     </Button>
                 </Stack>
