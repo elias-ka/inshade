@@ -1,20 +1,20 @@
 import { Autocomplete, TextField } from '@mui/material';
 import { debounce } from 'lodash';
 import { useEffect, useMemo } from 'react';
-import { AddressFeature } from '../models/Address';
+import { Address } from '../models/Address';
 
 interface SearchFieldProps {
     label: string;
     loading: boolean;
-    value: AddressFeature | null;
-    options: AddressFeature[] | undefined;
+    value: Address | null;
+    options: Address[] | undefined;
     onInput: (value: string) => void;
-    onChange: (value: AddressFeature | null) => void;
+    onChange: (value: Address | null) => void;
 }
 
-export function SearchField({ label, options, onInput, onChange, ...props }: SearchFieldProps) {
+export function SearchField({ label, options, onInput, onChange, ...rest }: SearchFieldProps) {
     const debouncedChangeHandler = useMemo(() => {
-        return debounce((value: string) => onInput(value), 300);
+        return debounce((value: string) => onInput(value), 500);
     }, []);
 
     useEffect(() => {
@@ -25,17 +25,15 @@ export function SearchField({ label, options, onInput, onChange, ...props }: Sea
 
     return (
         <Autocomplete
-            {...props}
+            {...rest}
             clearOnEscape
             autoHighlight
             size="small"
             sx={{ width: '100%' }}
             options={options || []}
-            getOptionLabel={(option) =>
-                option.properties.displayName || option.properties.name || ''
-            }
+            getOptionLabel={(option) => option.displayName || option.name || ''}
             isOptionEqualToValue={(option, value) => {
-                return option.properties.osmdId === value.properties.osmdId;
+                return option.osmId === value.osmId && option.placeId === value.placeId;
             }}
             onChange={(_event, value) => {
                 onChange(value);
@@ -44,6 +42,13 @@ export function SearchField({ label, options, onInput, onChange, ...props }: Sea
                 if (reason === 'input') debouncedChangeHandler(value);
             }}
             renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
+            renderOption={(props, option) => {
+                return (
+                    <li {...props} key={option.osmId}>
+                        <div>{option.displayName}</div>
+                    </li>
+                );
+            }}
         />
     );
 }
