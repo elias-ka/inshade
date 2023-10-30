@@ -1,23 +1,24 @@
-import { Button, Paper, Stack } from '@mui/material';
+import { Button, Card, Stack } from '@mui/material';
+import { LatLng } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { uniqueId } from 'lodash';
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import './App.css';
 import { search } from './api';
+import { MapRoute } from './components/MapRoute';
 import { SearchField } from './components/SearchField';
-import { AddressFeature, AddressFeatureCollection } from './models/Address';
+import { Address } from './models/Address';
 
 function App() {
     const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState<AddressFeatureCollection>();
+    const [searchResults, setSearchResults] = useState<Address[]>([]);
     const [loading, setLoading] = useState(false);
-    const [origin, setOrigin] = useState<AddressFeature | null>(null);
-    const [destination, setDestination] = useState<AddressFeature | null>(null);
+    const [origin, setOrigin] = useState<Address | null>(null);
+    const [destination, setDestination] = useState<Address | null>(null);
 
     useEffect(() => {
         setSearchTerm('');
-        setSearchResults(undefined);
+        setSearchResults([]);
     }, [origin, destination]);
 
     useEffect(() => {
@@ -30,12 +31,16 @@ function App() {
         })();
     }, [searchTerm]);
 
+    const getLatLng = (address: Address | null) => {
+        return address && new LatLng(parseFloat(address.lat), parseFloat(address.lon));
+    };
+
     return (
         <div>
-            <Paper
+            <Card
                 style={{
                     position: 'absolute',
-                    zIndex: 999,
+                    zIndex: 1000,
                     top: 0,
                     left: 0,
                     padding: '1em',
@@ -43,18 +48,18 @@ function App() {
             >
                 <Stack direction="column" spacing={2} style={{ width: '25em' }}>
                     <SearchField
-                        label={'Origin'}
+                        label={'Choose starting point'}
                         loading={loading}
                         value={origin}
-                        options={searchResults?.features}
+                        options={searchResults}
                         onInput={setSearchTerm}
                         onChange={setOrigin}
                     />
                     <SearchField
-                        label={'Destination'}
+                        label={'Choose destination'}
                         loading={loading}
                         value={destination}
-                        options={searchResults?.features}
+                        options={searchResults}
                         onInput={setSearchTerm}
                         onChange={setDestination}
                     />
@@ -62,17 +67,15 @@ function App() {
                         Submit
                     </Button>
                 </Stack>
-            </Paper>
-            <datalist id="search-results">
-                {searchResults?.features.map((address) => (
-                    <option key={uniqueId()} value={address.properties.displayName} />
-                ))}
-            </datalist>
+            </Card>
             <MapContainer
                 center={[50, 0]}
                 zoom={4}
                 scrollWheelZoom={true}
-                style={styles.mapContainer}
+                style={{
+                    height: '100vh',
+                    width: '100%',
+                }}
                 zoomAnimation={true}
                 zoomControl={false}
             >
@@ -80,16 +83,15 @@ function App() {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                 />
+                <MapRoute
+                    origin={getLatLng(origin)}
+                    destination={getLatLng(destination)}
+                    originTooltip={origin?.displayName}
+                    destinationTooltip={destination?.displayName}
+                />
             </MapContainer>
         </div>
     );
 }
-
-const styles = {
-    mapContainer: {
-        height: '100vh',
-        width: '100%',
-    },
-};
 
 export default App;
