@@ -1,41 +1,18 @@
 import ky from 'ky';
-import {
-    Address,
-    AddressFeature,
-    AddressFeatureCollection,
-    addressFeatureCollectionSchema,
-    addressSchema,
-} from './models/Address';
+import { z } from 'zod';
+import { Address, addressSchema } from './models/Address';
 
-const api = ky.create({
-    prefixUrl: 'https://nominatim.openstreetmap.org/',
-});
-
-export async function search(query: string): Promise<AddressFeatureCollection> {
-    const results = await api
-        .get('search', {
+export async function search(query: string): Promise<Address[]> {
+    const results = await ky
+        .get('https://nominatim.openstreetmap.org/search', {
             searchParams: {
                 q: query,
-                format: 'geojson',
+                format: 'json',
                 limit: '5',
+                addressdetails: 1,
             },
         })
-        .json<AddressFeatureCollection>();
+        .json<Address[]>();
 
-    return await addressFeatureCollectionSchema.parseAsync(results);
+    return await z.array(addressSchema).parseAsync(results);
 }
-
-// export async function reverseGeocode(lat: number, lon: number): Promise<Address> {
-//   const res = await api.get('reverse', {
-//     searchParams: {
-//       lat,
-//       lon,
-//       format: 'geojson',
-//     },
-//   });
-//   const json = await res.json<FeatureCollection<Geometry, Address>>();
-//   const feature = json.features[0];
-//   return {
-//     ...feature.properties,
-//   };
-// }
