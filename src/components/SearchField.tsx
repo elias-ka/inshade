@@ -31,7 +31,7 @@ export function SearchField({ label, options, onInput, onChange, ...rest }: Sear
             size="small"
             sx={{ width: '100%' }}
             options={options || []}
-            getOptionLabel={(option) => option.displayName || option.name || ''}
+            getOptionLabel={(option) => option.displayName || ''}
             isOptionEqualToValue={(option, value) => {
                 return option.osmId === value.osmId && option.placeId === value.placeId;
             }}
