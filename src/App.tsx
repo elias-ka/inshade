@@ -1,13 +1,13 @@
 import { Button, Card, Stack } from '@mui/material';
-import { LatLng } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import './App.css';
-import { search } from './api';
-import { MapRoute } from './components/MapRoute';
+import { doRoute, search } from './api';
+import { Journey } from './components/Journey';
 import { SearchField } from './components/SearchField';
 import { Address } from './models/Address';
+import { Route } from './models/Route';
 
 function App() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -15,10 +15,19 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [origin, setOrigin] = useState<Address | null>(null);
     const [destination, setDestination] = useState<Address | null>(null);
+    const [routes, setRoutes] = useState<Route[] | null>(null);
 
     useEffect(() => {
         setSearchTerm('');
         setSearchResults([]);
+        setRoutes(null);
+
+        (async () => {
+            if (origin && destination) {
+                const res = await doRoute(origin, destination);
+                setRoutes(res);
+            }
+        })();
     }, [origin, destination]);
 
     useEffect(() => {
@@ -30,10 +39,6 @@ function App() {
             setSearchResults(results);
         })();
     }, [searchTerm]);
-
-    const getLatLng = (address: Address | null) => {
-        return address && new LatLng(parseFloat(address.lat), parseFloat(address.lon));
-    };
 
     return (
         <div>
@@ -81,14 +86,9 @@ function App() {
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <MapRoute
-                    origin={getLatLng(origin)}
-                    destination={getLatLng(destination)}
-                    originTooltip={origin?.displayName}
-                    destinationTooltip={destination?.displayName}
-                />
+                <Journey origin={origin} destination={destination} routes={routes} />
             </MapContainer>
         </div>
     );
