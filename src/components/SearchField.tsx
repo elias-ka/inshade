@@ -1,15 +1,15 @@
 import { Autocomplete, TextField } from '@mui/material';
 import { debounce } from 'lodash';
 import { useEffect, useMemo } from 'react';
-import { Address } from '../models/Address';
+import { Place } from '../models/Address';
 
 interface SearchFieldProps {
     label: string;
     loading: boolean;
-    value: Address | null;
-    options: Address[] | undefined;
+    value: Place | null;
+    options: Place[] | undefined;
     onInput: (value: string) => void;
-    onChange: (value: Address | null) => void;
+    onChange: (value: Place | null) => void;
 }
 
 export function SearchField({ label, options, onInput, onChange, ...rest }: SearchFieldProps) {

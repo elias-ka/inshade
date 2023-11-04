@@ -3,42 +3,40 @@ import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import './App.css';
-import { doRoute, search } from './api';
 import { Journey } from './components/Journey';
 import { SearchField } from './components/SearchField';
-import { Address } from './models/Address';
-import { Route } from './models/Route';
+import { usePlaceSearch } from './data/usePlaceSearch';
+import { useRoute } from './data/useRoute';
+import { Place } from './models/Address';
 
 function App() {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState<Address[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [origin, setOrigin] = useState<Address | null>(null);
-    const [destination, setDestination] = useState<Address | null>(null);
-    const [routes, setRoutes] = useState<Route[] | null>(null);
+    const [origin, setOrigin] = useState<Place | null>(null);
+    const [destination, setDestination] = useState<Place | null>(null);
+    const routes = useRoute(origin, destination);
+
+    const [originQuery, setOriginQuery] = useState('');
+    const [destinationQuery, setDestinationQuery] = useState('');
+
+    const originPlaces = usePlaceSearch(originQuery);
+    const destinationPlaces = usePlaceSearch(destinationQuery);
 
     useEffect(() => {
-        setSearchTerm('');
-        setSearchResults([]);
-        setRoutes(null);
-
-        (async () => {
-            if (origin && destination) {
-                const res = await doRoute(origin, destination);
-                setRoutes(res);
-            }
-        })();
+        setOriginQuery('');
+        setDestinationQuery('');
     }, [origin, destination]);
 
-    useEffect(() => {
-        (async () => {
-            if (!searchTerm) return;
-            setLoading(true);
-            const results = await search(searchTerm);
-            setLoading(false);
-            setSearchResults(results);
-        })();
-    }, [searchTerm]);
+    // useEffect(() => {
+    //     setQuery('');
+    //     setResults([]);
+    //     setRoutes(null);
+
+    //     (async () => {
+    //         if (origin && destination) {
+    //             const res = await doRoute(origin, destination);
+    //             setRoutes(res);
+    //         }
+    //     })();
+    // }, [origin, destination]);
 
     return (
         <div>
@@ -54,18 +52,18 @@ function App() {
                 <Stack direction="column" spacing={2} style={{ width: '25em' }}>
                     <SearchField
                         label={'Choose starting point'}
-                        loading={loading}
+                        loading={originPlaces.isPending}
                         value={origin}
-                        options={searchResults}
-                        onInput={setSearchTerm}
+                        options={originPlaces.data}
+                        onInput={setOriginQuery}
                         onChange={setOrigin}
                     />
                     <SearchField
                         label={'Choose destination'}
-                        loading={loading}
+                        loading={destinationPlaces.isPending}
                         value={destination}
-                        options={searchResults}
-                        onInput={setSearchTerm}
+                        options={destinationPlaces.data}
+                        onInput={setDestinationQuery}
                         onChange={setDestination}
                     />
                     <Button variant="contained" color="primary" disabled={!origin || !destination}>
@@ -88,7 +86,7 @@ function App() {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <Journey origin={origin} destination={destination} routes={routes} />
+                <Journey origin={origin} destination={destination} routes={routes.data} />
             </MapContainer>
         </div>
     );

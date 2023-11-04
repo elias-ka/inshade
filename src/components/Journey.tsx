@@ -1,19 +1,19 @@
 import { latLng, latLngBounds } from 'leaflet';
 import { useEffect } from 'react';
 import { Marker, Polyline, Tooltip, useMap } from 'react-leaflet';
-import { Address } from '../models/Address';
+import { Place } from '../models/Address';
 import { Route } from '../models/Route';
 
 interface JourneyProps {
-    origin: Address | null;
-    destination: Address | null;
-    routes: Route[] | null;
+    origin: Place | null;
+    destination: Place | null;
+    routes: Route[] | undefined | null;
 }
 
 export function Journey({ origin, destination, routes }: JourneyProps) {
     const map = useMap();
 
-    const getLatLng = (address: Address) => {
+    const getLatLng = (address: Place) => {
         return latLng(parseFloat(address.lat), parseFloat(address.lon));
     };
     useEffect(() => {
