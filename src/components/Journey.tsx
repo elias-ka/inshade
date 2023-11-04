@@ -16,7 +16,6 @@ export function Journey({ origin, destination, routes }: JourneyProps) {
     const getLatLng = (address: Address) => {
         return latLng(parseFloat(address.lat), parseFloat(address.lon));
     };
-
     useEffect(() => {
         const bounds = [];
         if (origin) bounds.push(getLatLng(origin));
@@ -29,24 +28,24 @@ export function Journey({ origin, destination, routes }: JourneyProps) {
 
     return (
         <>
-            {origin && (
+            {origin ? (
                 <Marker position={getLatLng(origin)}>
                     <Tooltip>{origin.displayName}</Tooltip>
                 </Marker>
-            )}
-            {destination && (
+            ) : null}
+            {destination ? (
                 <Marker position={getLatLng(destination)}>
                     <Tooltip>{destination.displayName}</Tooltip>
                 </Marker>
-            )}
-            {routes && (
+            ) : null}
+            {routes ? (
                 <Polyline
                     positions={routes.map((route) =>
                         route.geometry.coordinates.map((c) => latLng(c[1], c[0]))
                     )}
                     weight={8}
                 />
-            )}
+            ) : null}
         </>
     );
 }
