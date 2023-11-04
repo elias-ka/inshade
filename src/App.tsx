@@ -25,19 +25,6 @@ function App() {
         setDestinationQuery('');
     }, [origin, destination]);
 
-    // useEffect(() => {
-    //     setQuery('');
-    //     setResults([]);
-    //     setRoutes(null);
-
-    //     (async () => {
-    //         if (origin && destination) {
-    //             const res = await doRoute(origin, destination);
-    //             setRoutes(res);
-    //         }
-    //     })();
-    // }, [origin, destination]);
-
     return (
         <div>
             <Card
