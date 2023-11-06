@@ -24,7 +24,7 @@ export function Journey({ origin, destination, routes }: JourneyProps) {
         if (bounds.length > 0 && !routes) {
             map.fitBounds(latLngBounds(bounds), { padding: [50, 50] });
         }
-    }, [origin, destination]);
+    }, [origin, destination, routes, map]);
 
     return (
         <>

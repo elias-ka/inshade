@@ -15,13 +15,13 @@ interface SearchFieldProps {
 export function SearchField({ label, options, onInput, onChange, ...rest }: SearchFieldProps) {
     const debouncedChangeHandler = useMemo(() => {
         return debounce((value: string) => onInput(value), 500);
-    }, []);
+    }, [onInput]);
 
     useEffect(() => {
         return () => {
             debouncedChangeHandler.cancel();
         };
-    }, []);
+    }, [debouncedChangeHandler]);
 
     return (
         <Autocomplete
@@ -30,8 +30,8 @@ export function SearchField({ label, options, onInput, onChange, ...rest }: Sear
             autoHighlight
             size="small"
             sx={{ width: '100%' }}
-            options={options || []}
-            getOptionLabel={(option) => option.displayName || ''}
+            options={options ?? []}
+            getOptionLabel={(option) => option.displayName ?? ''}
             isOptionEqualToValue={(option, value) => {
                 return option.osmId === value.osmId && option.placeId === value.placeId;
             }}
