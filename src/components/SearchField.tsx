@@ -12,7 +12,13 @@ interface SearchFieldProps {
     onChange: (value: Place | null) => void;
 }
 
-export function SearchField({ label, options, onInput, onChange, ...rest }: SearchFieldProps) {
+export default function SearchField({
+    label,
+    options,
+    onInput,
+    onChange,
+    ...rest
+}: SearchFieldProps) {
     const debouncedChangeHandler = useMemo(() => {
         return debounce((value: string) => onInput(value), 500);
     }, [onInput]);

@@ -10,7 +10,7 @@ interface JourneyProps {
     routes: Route[] | undefined | null;
 }
 
-export function Journey({ origin, destination, routes }: JourneyProps) {
+export default function Journey({ origin, destination, routes }: JourneyProps) {
     const map = useMap();
 
     const getLatLng = (address: Place) => {

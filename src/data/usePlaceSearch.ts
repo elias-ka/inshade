@@ -12,18 +12,19 @@ const searchPlace = async (term: string): Promise<Place[]> => {
             },
         })
         .catch((err) => {
-            console.error(err);
             return Promise.reject(err);
         });
 
     const json = await results.json<Place[]>();
 
-    return await nominatimResponseSchema.parseAsync(json);
+    return nominatimResponseSchema.parseAsync(json);
 };
 
-export const usePlaceSearch = (term: string) => {
+const usePlaceSearch = (term: string) => {
     return useQuery({
         queryKey: ['placeSearch', term],
         queryFn: () => searchPlace(term),
     });
 };
+
+export default usePlaceSearch;

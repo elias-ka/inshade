@@ -21,12 +21,14 @@ const fetchRoute = async (from: Place | null, to: Place | null): Promise<Route[]
         )
         .json<OsrmResponse>();
 
-    return await osrmResponseSchema.parseAsync(results).then((r) => r.routes);
+    return osrmResponseSchema.parseAsync(results).then((r) => r.routes);
 };
 
-export const useRoute = (from: Place | null, to: Place | null) => {
+const useRoute = (from: Place | null, to: Place | null) => {
     return useQuery({
         queryKey: ['route', from, to],
         queryFn: () => fetchRoute(from, to),
     });
 };
+
+export default useRoute;
