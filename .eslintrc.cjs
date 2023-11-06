@@ -9,6 +9,8 @@ module.exports = {
         'plugin:react/jsx-runtime',
         'plugin:react-hooks/recommended',
         'plugin:@tanstack/eslint-plugin-query/recommended',
+        'airbnb',
+        'airbnb/hooks',
         'plugin:prettier/recommended',
     ],
     ignorePatterns: ['dist', '.eslintrc.cjs'],
@@ -22,5 +24,11 @@ module.exports = {
     plugins: ['react-refresh'],
     rules: {
         'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+        'import/extensions': 'off',
+        'import/no-unresolved': 'off',
+        'react/react-in-jsx-scope': 'off',
+        'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
+        'react/jsx-props-no-spreading': 'off',
+        'no-unused-vars': 'off',
     },
 };
