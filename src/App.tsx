@@ -64,7 +64,6 @@ function App() {
                         <SearchField
                             label="Choose starting point"
                             loading={originPlaces.isPending}
-                            value={origin}
                             options={originPlaces.data}
                             onInput={setOriginQuery}
                             onChange={setOrigin}
@@ -72,7 +71,6 @@ function App() {
                         <SearchField
                             label="Choose destination"
                             loading={destinationPlaces.isPending}
-                            value={destination}
                             options={destinationPlaces.data}
                             onInput={setDestinationQuery}
                             onChange={setDestination}
