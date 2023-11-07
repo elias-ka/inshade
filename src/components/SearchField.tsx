@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, TextField, createFilterOptions } from '@mui/material';
 import { debounce } from 'lodash';
 import { useEffect, useMemo } from 'react';
 import { Place } from '../models/Address';
@@ -6,18 +6,17 @@ import { Place } from '../models/Address';
 interface SearchFieldProps {
     label: string;
     loading: boolean;
-    value: Place | null;
     options: Place[] | undefined;
+    onChange(value: Place): void;
     onInput: (value: string) => void;
-    onChange: (value: Place | null) => void;
 }
 
 export default function SearchField({
     label,
     options,
-    onInput,
+    loading,
     onChange,
-    ...rest
+    onInput,
 }: SearchFieldProps) {
     const debouncedChangeHandler = useMemo(() => {
         return debounce((value: string) => onInput(value), 500);
@@ -31,30 +30,31 @@ export default function SearchField({
 
     return (
         <Autocomplete
-            {...rest}
+            freeSolo
             clearOnEscape
             autoHighlight
+            onChange={(_, value) => {
+                if (value) {
+                    const option = options?.find((o) => o.displayName === value);
+                    if (option) {
+                        onChange(option);
+                    }
+                }
+            }}
+            filterOptions={createFilterOptions<string>({
+                ignoreCase: true,
+                ignoreAccents: true,
+                trim: true,
+                stringify: (option) => option,
+            })}
+            onInputChange={(_, value) => {
+                debouncedChangeHandler(value);
+            }}
+            loading={loading}
             size="small"
-            sx={{ width: '100%' }}
-            options={options ?? []}
-            getOptionLabel={(option) => option.displayName ?? ''}
-            isOptionEqualToValue={(option, value) => {
-                return option.osmId === value.osmId && option.placeId === value.placeId;
-            }}
-            onChange={(_event, value) => {
-                onChange(value);
-            }}
-            onInputChange={(_event, value, reason) => {
-                if (reason === 'input') debouncedChangeHandler(value);
-            }}
+            fullWidth
+            options={options?.map((option) => option.displayName ?? '') ?? []}
             renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
-            renderOption={(props, option) => {
-                return (
-                    <li {...props} key={option.osmId}>
-                        <div>{option.displayName}</div>
-                    </li>
-                );
-            }}
         />
     );
 }
