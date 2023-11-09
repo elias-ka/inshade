@@ -83,7 +83,7 @@ function App() {
                         <Button
                             variant="contained"
                             color="primary"
-                            disabled={!origin || !destination}
+                            disabled={!origin || !destination || routes.isPending}
                         >
                             Submit
                         </Button>
