@@ -4,11 +4,7 @@ import { Place } from '../models/Address';
 import { OsrmResponse, osrmResponseSchema } from '../models/OsrmResponse';
 import { Route } from '../models/Route';
 
-const fetchRoute = async (from: Place | null, to: Place | null): Promise<Route[]> => {
-    if (!from || !to) {
-        return [];
-    }
-
+const fetchRoute = async (from: Place, to: Place): Promise<Route[]> => {
     const results = await ky
         .get(
             `https://routing.openstreetmap.de/routed-car/route/v1/driving/${from.lon},${from.lat};${to.lon},${to.lat}`,
@@ -27,7 +23,12 @@ const fetchRoute = async (from: Place | null, to: Place | null): Promise<Route[]
 const useRoute = (from: Place | null, to: Place | null) => {
     return useQuery({
         queryKey: ['route', from, to],
-        queryFn: () => fetchRoute(from, to),
+        queryFn: () => {
+            if (!from || !to) {
+                return Promise.resolve([]);
+            }
+            return fetchRoute(from, to);
+        },
     });
 };
 
