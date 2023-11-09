@@ -11,6 +11,9 @@ export default function TimezoneSelect({ onChange, value }: TimezoneSelectProps)
 
     return (
         <Autocomplete
+            autoComplete
+            autoHighlight
+            disableClearable
             options={tzOptions}
             onChange={(_, tz) => {
                 if (tz) onChange(tz.value);
