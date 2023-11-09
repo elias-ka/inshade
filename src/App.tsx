@@ -1,16 +1,16 @@
-import { Autocomplete, Button, Card, Stack, TextField } from '@mui/material';
+import { Button, Card, Stack, Typography } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
-import { useTimezoneSelect } from 'react-timezone-select';
 import './App.css';
 import Journey from './components/Journey';
 import SearchField from './components/SearchField';
+import TimezoneSelect from './components/TimezoneSelect';
 import usePlaceSearch from './data/usePlaceSearch';
 import useRoute from './data/useRoute';
 import { Place } from './models/Address';
@@ -32,21 +32,9 @@ function App() {
     const [selectedDate, setSelectedDate] = useState(() => dayjs());
     const [selectedTz, setSelectedTz] = useState(() => dayjs.tz.guess());
 
-    const { options: tzOptions, parseTimezone } = useTimezoneSelect({});
-
     const worker = useMemo(() => {
         return new Worker(new URL('./worker.ts', import.meta.url));
     }, []);
-
-    useEffect(() => {
-        if (origin && destination) {
-            worker.postMessage({ origin, destination });
-        }
-
-        worker.onmessage = (e) => {
-            console.log(e.data);
-        };
-    }, [origin, destination, worker]);
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -60,7 +48,14 @@ function App() {
                         padding: '1em',
                     }}
                 >
+                    <Typography variant="h4">
+                        <strong>Inshade</strong>
+                    </Typography>
                     <Stack direction="column" spacing={2} style={{ width: '25em' }}>
+                        <Typography>
+                            Find the ideal bus seating side to reduce sun exposure during your
+                            travel
+                        </Typography>
                         <SearchField
                             label="Choose starting point"
                             loading={originPlaces.isPending}
@@ -84,17 +79,7 @@ function App() {
                             }}
                             slotProps={{ textField: { size: 'small' } }}
                         />
-                        <Autocomplete
-                            options={tzOptions}
-                            value={parseTimezone(selectedTz)}
-                            onChange={(_, tz) => {
-                                if (tz) setSelectedTz(tz.value);
-                            }}
-                            size="small"
-                            renderInput={(params) => (
-                                <TextField {...params} label="Timezone" variant="outlined" />
-                            )}
-                        />
+                        <TimezoneSelect onChange={setSelectedTz} value={selectedTz} />
                         <Button
                             variant="contained"
                             color="primary"
