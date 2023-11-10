@@ -1,5 +1,5 @@
 import z from 'zod';
-import { camelize } from '../util';
+import camelize from '../util';
 
 export const placeSchema = z
     .object({
