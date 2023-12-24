@@ -1,8 +1,9 @@
-import { Autocomplete, TextField } from '@mui/material';
-import { useTimezoneSelect } from 'react-timezone-select';
+import { Autocomplete, TextField, Typography } from '@mui/material';
+import { SyntheticEvent } from 'react';
+import { ITimezoneOption, useTimezoneSelect } from 'react-timezone-select';
 
 interface TimezoneSelectProps {
-    onChange(tz: string): void;
+    onChange(event: SyntheticEvent<Element, Event>, tz: ITimezoneOption): void;
     value: string;
 }
 
@@ -15,12 +16,17 @@ export default function TimezoneSelect({ onChange, value }: TimezoneSelectProps)
             autoHighlight
             disableClearable
             options={tzOptions}
-            onChange={(_, tz) => {
-                if (tz) onChange(tz.value);
-            }}
+            onChange={onChange}
             value={parseTimezone(value)}
             size="small"
             renderInput={(params) => <TextField {...params} label="Timezone" variant="outlined" />}
+            renderOption={(props, option) => {
+                return (
+                    <li {...props} key={option.value}>
+                        <Typography variant="body2">{option.label}</Typography>
+                    </li>
+                );
+            }}
         />
     );
 }
