@@ -1,22 +1,17 @@
 import { Button, Card, Stack, Typography } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
 import 'leaflet/dist/leaflet.css';
-import { useMemo, useState } from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { useEffect, useState } from 'react';
 import './App.css';
-import Journey from './components/Journey';
 import SearchField from './components/SearchField';
 import TimezoneSelect from './components/TimezoneSelect';
 import usePlaceSearch from './data/usePlaceSearch';
 import useRoute from './data/useRoute';
 import { Place } from './models/Address';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import { SunExposureResult, sunExposureWorker } from './worker';
+import dayjs from 'dayjs';
+import MapWrapper from './components/MapWrapper';
 
 function App() {
     const [origin, setOrigin] = useState<Place | null>(null);
@@ -29,12 +24,30 @@ function App() {
     const originPlaces = usePlaceSearch(originQuery);
     const destinationPlaces = usePlaceSearch(destinationQuery);
 
-    const [selectedDate, setSelectedDate] = useState(() => dayjs());
     const [selectedTz, setSelectedTz] = useState(() => dayjs.tz.guess());
+    const [selectedDate, setSelectedDate] = useState(() => dayjs().tz(selectedTz, true));
 
-    const worker = useMemo(() => {
-        return new Worker(new URL('./worker.ts', import.meta.url));
-    }, []);
+    const [workerResult, setWorkerResult] = useState<SunExposureResult | null>(null);
+
+    const postMessage = () => {
+        if (!routes.data || !selectedDate || !selectedTz) return;
+        sunExposureWorker.postMessage([
+            selectedDate.tz(selectedTz, true).toDate(),
+            routes.data.flatMap((route) => route.geometry.coordinates),
+            routes.data.reduce((acc, route) => acc + route.duration, 0),
+        ]);
+    };
+
+    useEffect(() => {
+        sunExposureWorker.onmessage = (event) => {
+            setWorkerResult(event.data as SunExposureResult);
+            console.log(event.data);
+        };
+    });
+
+    useEffect(() => {
+        setWorkerResult(null);
+    }, [origin, destination, selectedDate, selectedTz]);
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -45,10 +58,10 @@ function App() {
                         zIndex: 1000,
                         top: 0,
                         left: 0,
-                        padding: '1em',
+                        padding: '0.75em',
                     }}
                 >
-                    <Typography variant="h4">
+                    <Typography variant="h5">
                         <strong>Inshade</strong>
                     </Typography>
                     <Stack direction="column" spacing={2} style={{ width: '25em' }}>
@@ -72,40 +85,34 @@ function App() {
                         />
                         <DateTimePicker
                             label="Date and time"
-                            reduceAnimations
                             value={selectedDate}
                             onChange={(date) => {
                                 if (date) setSelectedDate(date);
                             }}
                             slotProps={{ textField: { size: 'small' } }}
                         />
-                        <TimezoneSelect onChange={setSelectedTz} value={selectedTz} />
+                        <TimezoneSelect
+                            onChange={(_, tz) => setSelectedTz(tz.value)}
+                            value={selectedTz}
+                        />
                         <Button
                             variant="contained"
                             color="primary"
                             disabled={!origin || !destination || routes.isPending}
+                            onClick={() => {
+                                postMessage();
+                            }}
                         >
                             Submit
                         </Button>
                     </Stack>
                 </Card>
-                <MapContainer
-                    center={[50, 0]}
-                    zoom={4}
-                    scrollWheelZoom
-                    style={{
-                        height: '100vh',
-                        width: '100%',
-                    }}
-                    zoomAnimation
-                    zoomControl={false}
-                >
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Journey origin={origin} destination={destination} routes={routes.data} />
-                </MapContainer>
+                <MapWrapper
+                    origin={origin}
+                    destination={destination}
+                    routes={routes}
+                    workerResult={workerResult}
+                />
             </div>
         </LocalizationProvider>
     );

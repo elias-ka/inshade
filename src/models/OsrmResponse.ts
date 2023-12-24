@@ -2,7 +2,6 @@ import z from 'zod';
 import { routeSchema } from './Route';
 
 export const osrmResponseSchema = z.object({
-    code: z.string(),
     routes: z.array(routeSchema),
 });
 
