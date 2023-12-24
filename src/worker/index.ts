@@ -3,7 +3,7 @@ import workerUrl from './worker.ts?worker&url';
 export interface SunExposureResult {
     leftPercentage: number;
     rightPercentage: number;
-    noSunPercentage: number;
+    notVisiblePercentage: number;
     segments: number[];
 }
 
