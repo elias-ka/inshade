@@ -1,7 +1,7 @@
-import { Autocomplete, TextField } from '@mui/material';
-import { debounce } from 'lodash';
+import { Autocomplete, TextField, Typography } from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import { Place } from '../models/Address';
+import { debounce } from 'lodash';
 
 interface SearchFieldProps {
     label: string;
@@ -43,6 +43,13 @@ export default function SearchField({
                 typeof option === 'string' ? option : option.displayName ?? ''
             }
             renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
+            renderOption={(props, option) => {
+                return (
+                    <li {...props} key={option.osmId}>
+                        <Typography variant="body2">{option.displayName}</Typography>
+                    </li>
+                );
+            }}
         />
     );
 }
