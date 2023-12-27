@@ -1,9 +1,9 @@
 import workerUrl from './worker.ts?worker&url';
 
 export interface SunExposureResult {
-    leftPercentage: number;
-    rightPercentage: number;
-    notVisiblePercentage: number;
+    leftPercentage: string;
+    rightPercentage: string;
+    notVisiblePercentage: string;
     segments: number[];
 }
 
