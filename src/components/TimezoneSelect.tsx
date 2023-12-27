@@ -3,11 +3,12 @@ import { SyntheticEvent } from 'react';
 import { ITimezoneOption, useTimezoneSelect } from 'react-timezone-select';
 
 interface TimezoneSelectProps {
+    label?: string;
     onChange(event: SyntheticEvent<Element, Event>, tz: ITimezoneOption): void;
     value: string;
 }
 
-export default function TimezoneSelect({ onChange, value }: TimezoneSelectProps) {
+export default function TimezoneSelect({ label, onChange, value }: TimezoneSelectProps) {
     const { options: tzOptions, parseTimezone } = useTimezoneSelect({});
 
     return (
@@ -19,7 +20,7 @@ export default function TimezoneSelect({ onChange, value }: TimezoneSelectProps)
             onChange={onChange}
             value={parseTimezone(value)}
             size="small"
-            renderInput={(params) => <TextField {...params} label="Timezone" variant="outlined" />}
+            renderInput={(params) => <TextField {...params} label={label} />}
             renderOption={(props, option) => {
                 return (
                     <li {...props} key={option.value}>

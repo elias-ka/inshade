@@ -12,6 +12,7 @@ import { Place } from './models/Address';
 import { SunExposureResult, sunExposureWorker } from './worker';
 import dayjs from 'dayjs';
 import MapWrapper from './components/MapWrapper';
+import { SunExposureDisplay } from './components/SunExposureDisplay';
 
 function App() {
     const [origin, setOrigin] = useState<Place | null>(null);
@@ -41,7 +42,6 @@ function App() {
     useEffect(() => {
         sunExposureWorker.onmessage = (event) => {
             setWorkerResult(event.data as SunExposureResult);
-            console.log(event.data);
         };
     });
 
@@ -64,34 +64,42 @@ function App() {
                     <Typography variant="h5">
                         <strong>Inshade</strong>
                     </Typography>
-                    <Stack direction="column" spacing={2} style={{ width: '25em' }}>
+                    <Stack
+                        direction="column"
+                        spacing={1.5}
+                        style={{
+                            width: '25em',
+                        }}
+                    >
                         <Typography>
                             Find the ideal bus seating side to reduce sun exposure during your
                             travel
                         </Typography>
                         <SearchField
-                            label="Choose starting point"
+                            label="Enter origin"
                             loading={originPlaces.isPending}
                             options={originPlaces.data}
                             onInput={setOriginQuery}
                             onChange={setOrigin}
                         />
                         <SearchField
-                            label="Choose destination"
+                            label="Enter destination"
                             loading={destinationPlaces.isPending}
                             options={destinationPlaces.data}
                             onInput={setDestinationQuery}
                             onChange={setDestination}
                         />
                         <DateTimePicker
-                            label="Date and time"
+                            label="Date and time of departure"
                             value={selectedDate}
                             onChange={(date) => {
                                 if (date) setSelectedDate(date);
                             }}
                             slotProps={{ textField: { size: 'small' } }}
+                            timezone={selectedTz}
                         />
                         <TimezoneSelect
+                            label="Timezone of departure"
                             onChange={(_, tz) => setSelectedTz(tz.value)}
                             value={selectedTz}
                         />
@@ -105,6 +113,7 @@ function App() {
                         >
                             Submit
                         </Button>
+                        {workerResult ? <SunExposureDisplay result={workerResult} /> : null}
                     </Stack>
                 </Card>
                 <MapWrapper
