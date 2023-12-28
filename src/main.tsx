@@ -18,17 +18,17 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            staleTime: Infinity,
-        },
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
     },
+  },
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-        <QueryClientProvider client={queryClient}>
-            <App />
-        </QueryClientProvider>
-    </React.StrictMode>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  </React.StrictMode>
 );
