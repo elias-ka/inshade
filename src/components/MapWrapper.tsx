@@ -25,7 +25,7 @@ export default function MapWrapper({ origin, destination, routes, workerResult }
       zoomControl={false}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='<a href="https://github.com/elias-ka/inshade">Inshade source code</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         keepBuffer={16}
         crossOrigin
