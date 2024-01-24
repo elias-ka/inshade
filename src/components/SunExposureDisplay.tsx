@@ -43,7 +43,7 @@ export function SunExposureDisplay({ result }: SunExposureDisplayProps) {
       </Typography>
       <PercentageDisplay label="Left Side" value={result.leftPercentage} color="#FFA500" />
       <PercentageDisplay label="Right Side" value={result.rightPercentage} color="#4A90E2" />
-      <PercentageDisplay label="Not Visible" value={result.notVisiblePercentage} color="gray" />
+      <PercentageDisplay label="Sun not visible" value={result.notVisiblePercentage} color="gray" />
     </Box>
   );
 }
