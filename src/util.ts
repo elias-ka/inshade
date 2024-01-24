@@ -1,6 +1,8 @@
 import camelcaseKeys from 'camelcase-keys';
 
-export const camelize = <T extends readonly unknown[] | Record<string, unknown>>(val: T) => {
+export const camelize = <T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
+  val: T
+) => {
   return camelcaseKeys(val);
 };
 
